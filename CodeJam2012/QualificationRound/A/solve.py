@@ -60,6 +60,22 @@ class Table(dict):
 			table[srcchars.pop()] = dstchars.pop()
 		return table
 
+	# エラーチェックしないならもっと簡易なテーブル構成方法
+	@classmethod
+	def maketable_alt(cls, src, dst):
+		table = cls(zip(src, dst))
+
+		# 問題文にあった対応
+		table.update(dict((('y', 'a'),
+						   ('e', 'o'),
+						   ('q', 'z'))))
+
+		# 残り文字の対応
+		table.update(dict(zip(filter(lambda c: c not in table.keys(), cls.TARGET),
+							  filter(lambda c: c not in table.values(), cls.TARGET))))
+
+		return table
+
 
 def main():
 	# 変換テーブルを作る
