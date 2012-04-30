@@ -6,32 +6,23 @@
 #
 
 import sys
-import string
 
 
 def solve(A, B):
-	# Given integers A and B with the same number of digits
-	# なのでAとBは同じケタ数のはず
-	top = str(B)[0]
+	# 桁数
+	digits = len(str(A))
+	# 重複する組み合せを避けるため set で持っておく
+	found = set()
 
-	count = 0
 	for n in xrange(A, B):		# n=B のケースは検証不要(n < m <= B になりえない)
-		digit = str(n)
-		found = set()
-		for index in range(1, len(digit)):
-			if digit[index] < digit[0]:
-				# m の先頭が n の先頭より小さい → n < m にならない
-				continue
-			if digit[index] > top:
-				# m の先頭が B の先頭より大きい → m <= B にならない
-				continue
-
-			m = int(digit[index:] + digit[:index])
-			if n < m and m <= B and m not in found:
-				found.add(m)		# distinct 判定(見つけたものは除外)
-				count += 1
-				#print n, m
-	return count
+		for k in range(1, digits):
+			# 数字の並びを移動した m を作る
+			div = 10 ** k
+			m = (n / div) + (n % div) * (10 ** (digits - k))
+			if n < m and m <= B:
+				# A <= n < m <= B の条件に合致する
+				found.add((n, m))
+	return len(found)
 
 
 def main(IN, OUT):
