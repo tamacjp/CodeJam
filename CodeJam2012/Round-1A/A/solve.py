@@ -9,31 +9,35 @@ import sys
 
 
 def solve(length, correctly):
+    # 入力文字数
     inputed = len(correctly)
-
-    # N文字目でミスタイプする確率
-    wrong = []
-    left = 1    # 残り
-    for rate in correctly:
-        # ミスタイプする確率
-        wrong.append(left * (1 - rate))
-        # 正しく入力して次の文字へ進む確率
-        left *= rate
 
     # backspace入力回数別期待値
     expected = []
-    for bs in range(inputed + 1):
+
+    correct = 1    # 残り
+    for index, rate in enumerate(correctly):
+        # ここまで文字を消すのに必要な backspace 入力数
+        bs = inputed - index
         # backspaceをbs回タイプ + bs文字入力し直し + 残り文字 + [enter]
         count = bs + bs + (length - inputed) + 1
-        # backspaceで消せなかったミスタイプがある確率
-        misstype = sum(wrong[:inputed - bs])
+
+        # パスワード入力成功までのキー入力数の期待値
         expected.append(
             # backspace で戻ってもミスが残ったままでもう一度入力し直す場合
-            (count + length + 1) * misstype
+            (count + length + 1) * (1 - correct)
             # backspace で戻って入力し直すと正解する場合
-            + count * (1 - misstype))
+            + count * correct)
 
-    # このまま [enter] して入力し直す
+        # 正しく入力して次の文字へ進む確率
+        correct *= rate
+
+    # このまま入力を続ける場合(bs=0 の場合)
+    count = (length - inputed) + 1
+    expected.append((count + length + 1) * (1 - correct)
+                    + count * correct)
+
+    # [enter] して入力し直す場合
     expected.append(1 + length + 1)
 
     # 最小の期待値を回答
