@@ -10,52 +10,48 @@ import sys
 
 class Level:
     def __init__(self, requires):
+        # 1つ星条件、2つ星条件
         self.star1, self.star2 = requires
+        # 残っている星の数
         self.left = 2
 
 
 def solve(levels):
-    #print [(level.star1, level.star2) for level in levels]
+    # 獲得した星
     star = 0
+    # ステップ数
     step = 0
 
+    # 2つ星条件が小さい順にソートしておく
+    levels.sort(key=lambda level: level.star2)
+
+    # ステージが残っている間
     while levels:
+        # ループ開始時の星の数
         begin = star
 
-        # 1. 2 stars 取れるものがあれば
-        for level in sorted(filter(lambda level: level.left == 2, levels), key=lambda level: level.star2):
-            if level.star2 <= star:
-                step += 1
-                star += level.left
-                #print '%d clear +%d => %d' % (level.star2, level.left, star)
-                levels.remove(level)
-            else:
-                break
-
-        # 2. すでに 1 star 取っているレベルで残りの star を取れるなら
-        for level in sorted(filter(lambda level: level.left == 1, levels), key=lambda level: level.star2):
-            if level.star2 <= star:
-                step += 1
-                star += level.left
-                #print '%d clear +%d => %d' % (level.star2, level.left, star)
-                levels.remove(level)
-            else:
-                break
-
-        if star > begin:
-            # ここまでにスターが増えていたらもう一度最初から
-            continue
-
-        # 3. 1 star しか取れないもったいないケース
-        level = sorted(filter(lambda level: level.left == 2 and level.star1 <= star, levels),
-                       key=lambda level: level.star2, reverse=True)
-        if level:
+        # 2つ星条件をクリアできる
+        while levels and levels[0].star2 <= star:
+            # このステージの残っている星を加算(2つ星取ってこのステージは終わるのでリストから削除)
+            star += levels.pop(0).left
             step += 1
+
+        if not levels:
+            # ステージが無くなった → 終了!
+            break
+
+        # 1つ星条件しか満たしていないケース
+        weaks = filter(lambda level: level.left == 2 and level.star1 <= star, levels)
+        if weaks:
+            # 2つ星条件が大きいものから使っていく
+            level = sorted(weaks, key=lambda level: level.star2, reverse=True)[0]
+            # 星を1つだけ加算
             star += 1
-            #print '%d clear +%d => %d' % (level[0].star1, 1, star)
-            level[0].left -= 1
+            # 残り星を減らす
+            level.left -= 1
+            step += 1
         else:
-            # 1つも star を取れなかった
+            # 星を取れなくなった
             return 'Too Bad'
 
     return step
