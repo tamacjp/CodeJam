@@ -12,21 +12,23 @@ def solve(length, correctly):
     # 入力文字数
     inputed = len(correctly)
 
-    # backspace入力回数別期待値
+    # [backspace]入力回数別期待値
     expected = []
 
-    correct = 1    # 残り
-    for index, rate in enumerate(correctly):
-        # ここまで文字を消すのに必要な backspace 入力数
-        bs = inputed - index
-        # backspaceをbs回タイプ + bs文字入力し直し + 残り文字 + [enter]
-        count = bs + bs + (length - inputed) + 1
+    # ここまでが正しく入力されている確率
+    correct = 1
+
+    for left, rate in enumerate(correctly):
+        # ここまで文字を消すのに必要な [backspace]入力数
+        bs = inputed - left
+        # [backspace]をbs回 + パスワードの残り文字数 + [enter]を1回
+        count = bs + (length - left) + 1
 
         # パスワード入力成功までのキー入力数の期待値
         expected.append(
-            # backspace で戻ってもミスが残ったままでもう一度入力し直す場合
+            # [backspace]で戻ってもミスが残ったままでもう一度入力し直す場合
             (count + length + 1) * (1 - correct)
-            # backspace で戻って入力し直すと正解する場合
+            # [backspace]で戻って入力し直すと正解する場合
             + count * correct)
 
         # 正しく入力して次の文字へ進む確率
