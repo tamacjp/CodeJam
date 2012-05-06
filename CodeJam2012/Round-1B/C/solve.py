@@ -10,13 +10,18 @@ import itertools
 
 
 def solve(S):
-    sums = dict((s, (s, )) for s in S)
-    for n in range(2, len(S)):
+    found = {}
+    # Combination(組み合せ)を作る要素の数を増やしていく
+    for n in range(1, len(S)):
+        # Sから n個の要素の重複しない組み合せ
         for pair in itertools.combinations(S, n):
             num = sum(pair)
-            if num in sums:
-                return '\n%s\n%s' % (' '.join(map(str, sums[num])), ' '.join(map(str, pair)))
-            sums[num] = pair
+            if num in found:
+                # 合計が既にある ⇒ それを返す
+                return '\n%s\n%s' % (' '.join(map(str, found[num])), ' '.join(map(str, pair)))
+            # 合計をキーに辞書に記録しておく
+            found[num] = pair
+    # 見つからなかったー
     return ' Impossible'
 
 
