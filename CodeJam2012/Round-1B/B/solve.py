@@ -49,17 +49,19 @@ class Square:
 
 
 def solve(H, N, M, squares):
+    start = (0, 0)
+
     # 各 square に到達する最短時間
     timemap = {}
-    timemap[(0, 0)] = 0.0  # squares[0][0].time
+    timemap[start] = squares[start].time
     # チェックキュー
-    queue = [(0, 0)]
+    queue = [start]
 
     while queue:
         # キューからチェックする座標を取得
         x, y = queue.pop(0)
         # チェックするsquareとそこに来るまでの最短時間
-        current = squares[y][x]
+        current = squares[(x, y)]
         time = timemap[(x, y)]
 
         # どの方角へ進む?
@@ -79,7 +81,7 @@ def solve(H, N, M, squares):
 
         # 候補の方角へ
         for newx, newy in to:
-            square = squares[newy][newx]
+            square = squares[(newx, newy)]
             # ここから進める?
             if square.enter(current):
                 # ここまでの最短時間 or 次のsquareに入れる時間
@@ -104,10 +106,16 @@ def main(INPUT, OUTPUT):
     for index in range(T):
         # 進捗表示
         sys.stderr.write('#%d\r' % (index + 1))
-        H, N, M = map(int, INPUT.readline().strip().split())
-        ceiling = [map(int, INPUT.readline().strip().split()) for n in range(N)]
-        floor = [map(int, INPUT.readline().strip().split()) for n in range(N)]
-        squares = [[Square(c, f, H) for c, f in zip(C, F)] for C, F in zip(ceiling, floor)]
+        # 水位, マップの高さと幅
+        H, N, M = map(int, INPUT.readline().split())
+        # 天井の高さ
+        ceiling = [map(int, INPUT.readline().split()) for n in range(N)]
+        # 床の高さ
+        floor = [map(int, INPUT.readline().split()) for n in range(N)]
+        # squareマップ構成
+        squares = dict(((x, y), Square(c, f, H))
+                       for y, (C, F) in enumerate(zip(ceiling, floor))
+                       for x, (c, f) in enumerate(zip(C, F)))
         OUTPUT.write('Case #%d: %s\n' % (index + 1, solve(H, N, M, squares)))
 
 
