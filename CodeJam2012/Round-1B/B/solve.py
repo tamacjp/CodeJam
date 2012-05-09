@@ -55,11 +55,12 @@ def solve(H, N, M, squares):
     timemap = {}
     timemap[start] = squares[start].time
     # チェックキュー
-    queue = [start]
+    queue = set()
+    queue.add(start)
 
     while queue:
         # キューからチェックする座標を取得
-        x, y = queue.pop(0)
+        x, y = queue.pop()
         # チェックするsquareとそこに来るまでの最短時間
         current = squares[(x, y)]
         time = timemap[(x, y)]
@@ -95,7 +96,7 @@ def solve(H, N, M, squares):
                     # 新しく移動経路が見つかった or より速い経路が見つかった
                     timemap[(newx, newy)] = wait
                     # この場所を調べ直すべくキューに入れる
-                    queue.append((newx, newy))
+                    queue.add((newx, newy))
 
     # ゴール(南東)に到達する最短時間 ※必ず経路があるはず…
     return timemap[(M - 1, N - 1)]
