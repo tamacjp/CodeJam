@@ -14,6 +14,35 @@ class Class:
         self.inherits = inherits
 
 
+# サブクラス終端からルートクラスに辿る場合
+def solve(classes):
+    for cls in classes:
+        if not filter(lambda c: cls.no in c.inherits, classes):
+            # このクラスを継承しているクラスがない → サブクラスの終端からスタート
+
+            # 祖先リスト
+            ascendant = list(cls.inherits)
+            index = 0
+            while index < len(ascendant):
+                # 次に調べるクラスのID
+                clsid = ascendant[index]
+
+                # 親クラスをチェック
+                for inherit in classes[clsid-1].inherits:
+                    if inherit in ascendant:
+                        # 既に同じクラスが祖先にいる → Diamond Inheritance 発見
+                        return "Yes"
+                    # 祖先リストに追加
+                    ascendant.append(inherit)
+
+                # 祖先リスト次の項目を調べる
+                index += 1
+
+    # 全てのサブクラス終端から始めて一度も同じ祖先に辿り着かなかった
+    return "No"
+
+
+# ルートクラスからサブクラスを列挙する場合
 def solve(classes):
     # クラス→スーパークラス のリストから、クラスID→サブクラスIDのリスト を構築する
     subclassmap = dict((cls.no, set()) for cls in classes)
